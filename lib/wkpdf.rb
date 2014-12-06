@@ -38,8 +38,8 @@ module WKPDF
     app_delegate = AppDelegate.alloc.init
     ::NSApp.setDelegate(app_delegate)
 
-    parser = CommandlineParser.instance
-    parser.parse
+    $clparser = CommandlineParser.new
+    $clparser.parse
 
     # use 1x1 size: when pagination is turned off, the view should grow to the 
     # required size, if turned on, the view should use the page size. 
@@ -47,7 +47,7 @@ module WKPDF
     
     # Parenting webView with a window fixes issue #19
     window = ::NSWindow.alloc.initWithContentRect_styleMask_backing_defer(
-            NSMakeRect(0,0,parser.screenWidth.to_i(),1),
+            NSMakeRect(0,0,1,1),
             NSBorderlessWindowMask,
             NSBackingStoreNonretained, false)
     window.setContentView(webView)
@@ -57,16 +57,16 @@ module WKPDF
     webPrefs.setAllowsAnimatedImages(true)
     webPrefs.setAllowsAnimatedImageLooping(false)
     webPrefs.setJavaEnabled(false)
-    webPrefs.setPlugInsEnabled(parser.enablePlugins)
-    webPrefs.setJavaScriptEnabled(parser.enableJavascript)
+    webPrefs.setPlugInsEnabled($clparser.enablePlugins)
+    webPrefs.setJavaScriptEnabled($clparser.enableJavascript)
     webPrefs.setJavaScriptCanOpenWindowsAutomatically(false)
-    webPrefs.setShouldPrintBackgrounds(parser.printBackground)
+    webPrefs.setShouldPrintBackgrounds($clparser.printBackground)
     webPrefs.setUserStyleSheetEnabled(false)
 
-    if parser.userStylesheet != "" then
+    if $clparser.userStylesheet != "" then
       webPrefs.setUserStyleSheetEnabled(true)
-      webPrefs.setUserStyleSheetLocation(parser.userStylesheet)
-      puts "setting user style sheet to #{parser.userStylesheet}\n" if parser.debug
+      webPrefs.setUserStyleSheetLocation($clparser.userStylesheet)
+      puts "setting user style sheet to #{$clparser.userStylesheet}\n" if $clparser.debug
     end
 
     controller = Controller.alloc.initWithWebView(webView)
@@ -76,15 +76,15 @@ module WKPDF
     webView.setPreferences(webPrefs)
     webView.setMaintainsBackForwardList(false)
 
-    if parser.stylesheetMedia != "" then
-      webView.setMediaStyle(parser.stylesheetMedia)
+    if $clparser.stylesheetMedia != "" then
+      webView.setMediaStyle($clparser.stylesheetMedia)
     end
 
     pool = ::NSAutoreleasePool.alloc.init
 
-    puts "wkpdf started\n" if parser.debug
+    puts "wkpdf started\n" if $clparser.debug
     request = ::NSURLRequest.requestWithURL_cachePolicy_timeoutInterval(
-    parser.source, parser.cachingPolicy, parser.timeout)
+    $clparser.source, $clparser.cachingPolicy, $clparser.timeout)
 
     # TODO: detect timeout and terminate if timeout occured
 

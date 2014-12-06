@@ -7,7 +7,6 @@ require 'trollop'
 class CommandlineParser
 
   include OSX
-  include Singleton
 
   attr_accessor :source                   # NSURL
   attr_accessor :output                   # NSURL
