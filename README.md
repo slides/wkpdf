@@ -1,3 +1,39 @@
+### Fork Description
+This fork makes the library work using ruby 2 (2.1.5) and Yosemite. The instructions are based on the [original guide](https://github.com/plessl/wkpdf/wiki/How-to-install-on-MacOS-10.10-Yosemite) to installing under Yosemite.
+
+1. Install Ruby through RVM with these options:   
+`rvm install 2.1.5 --debug --reconfigure -C --enable-shared=yes`  
+
+2. Start using the newly installed ruby: `rvm use 2.1.5` 
+
+3. Build the gem from this repository using `gem build wkpdf.gemspec`, then install it using `gem install <gem-name>`.
+
+4. Edit its bin `nano /usr/bin/wkpdf` so that in the first `#!` line it uses your newly installed ruby (do a `which ruby` and it should be something like `~/.rvm/rubies/ruby-2.1.5/bin/ruby`).
+
+5. Download the latest RubyCocoa version:  
+`wget http://sourceforge.net/projects/rubycocoa/files/RubyCocoa/1.2.0/RubyCocoa-1.2.0.tar.gz/download RubyCocoa-1.2.0.tar.gz -O RubyCocoa-1.2.0.tar.gz`
+
+6. Uncompress into a folder and move into it: `tar xzf RubyCocoa-1.2.0.tar.gz && rm RubyCocoa-1.2.0.tar.gz && cd RubyCocoa-1.2.0`
+
+7. Modify the install file `nano pre-install.rb` and add the following two lines at the top:
+ ```
+ Encoding.default_external = Encoding::UTF_8
+ Encoding.default_internal = Encoding::UTF_8
+ ```
+
+8. Config the RubyCocoa installation: `ruby install.rb config --target-archs="x86_64"` (see [this gist](https://gist.github.com/thibaudgg/294465))
+
+9. Setup & run the RubyCocoa installation:   
+`ruby install.rb setup`  
+`sudo ruby install.rb install`
+
+10. That's it, run wkpdf's help to test it works:
+`wkpdf --help`
+
+
+
+-----
+
 wkpdf
 =====
 
