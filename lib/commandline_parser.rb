@@ -1,4 +1,3 @@
-require 'rdoc/usage'
 require 'osx/cocoa'
 require 'yaml'
 require 'rubygems'
