@@ -19,7 +19,7 @@ class Controller < NSObject
     log("webView #{sender} didFinishLoadForFrame #{frame}, parentFrame: #{frame.parentFrame}\n")
 
     return if frame.parentFrame # sub-frame on page, page not fully loaded yet
-    p = $clparser
+    p = CommandlineParser.instance
     if !p.ignoreHttpErrors then
       self.checkResponseCodeforFrame(sender,frame)
     end
@@ -50,13 +50,13 @@ class Controller < NSObject
   # indicates errors for a partially loaded page
   def webView_didFailLoadWithError_forFrame(sender,error,frame)
     log("webView #{sender} didFailLoadWithError: #{error.localizedDescription}, Frame: #{frame}\n")
-    NSApplication.sharedApplication.terminate(nil) unless $clparser.ignoreHttpErrors
+    NSApplication.sharedApplication.terminate(nil) unless CommandlineParser.instance.ignoreHttpErrors
   end
 
   # indicates errors for initially loading a page
   def webView_didFailProvisionalLoadWithError_forFrame(sender,error,frame)
     log("webView #{sender} didFailProvisionalLoadWithError \"#{error.localizedDescription}\", Frame: #{frame}")
-    NSApplication.sharedApplication.terminate(nil) unless $clparser.ignoreHttpErrors
+    NSApplication.sharedApplication.terminate(nil) unless CommandlineParser.instance.ignoreHttpErrors
   end
 
   # accessing a password protected resource
@@ -64,7 +64,7 @@ class Controller < NSObject
     log("webView #{sender} didReceiveAuthenticationChallenge challenge: #{challenge} from data source: #{dataSource}")
 
     if challenge.previousFailureCount == 0 then
-      p = $clparser
+      p = CommandlineParser.instance
       credential = NSURLCredential.credentialWithUser_password_persistence(p.username,p.password,NSURLCredentialPersistenceForSession)
       challenge.sender.useCredential_forAuthenticationChallenge(sender,challenge)
     else
@@ -76,7 +76,7 @@ class Controller < NSObject
   # notification that a resource is unavailable
   def webView_resource_didFailLoadingWithError_fromDataSource(sender,identifier,error,dataSource)
     log("didFailLoadingWithError identifier: #{identifier} error: #{error.localizedDescription} dataSource: #{dataSource}\n")
-    p = $clparser
+    p = CommandlineParser.instance
     unless p.ignoreHttpErrors then
       puts "Could not load resource #{identifier}, error: #{error.localizedDescription}\n"
       NSApplication.sharedApplication.terminate(nil)
@@ -86,7 +86,7 @@ class Controller < NSObject
   # plugin failed to load
   def webView_plugInFailedWithError_dataSource(sender,error,dataSource)
     puts "plugInFailedWithError error: #{error.localizedDescription} dataSource: #{dataSource}\n"
-    p = $clparser
+    p = CommandlineParser.instance
     unless p.ignoreHttpErrors then
       puts "Could not load plugin, error: #{error.localizedDescription}\n"
       NSApplication.sharedApplication.terminate(nil)
@@ -108,7 +108,7 @@ class Controller < NSObject
 
   def makePDF(timer)
     log("webView #{webView} makePDF\n")
-    p = $clparser
+    p = CommandlineParser.instance
     if p.paginate then
       makePaginatedPDF
     else
@@ -119,7 +119,7 @@ class Controller < NSObject
   def makePaginatedPDF
       
     log("Make paginated PDF...\n")
-    p = $clparser
+    p = CommandlineParser.instance
 
     sharedInfo = NSPrintInfo.sharedPrintInfo
     sharedDict = sharedInfo.dictionary
@@ -152,7 +152,7 @@ class Controller < NSObject
 
   def makeSinglePagePDF
     log("Make single-page PDF...\n")
-    p = $clparser
+    p = CommandlineParser.instance
     viewToPrint = webView.mainFrame.frameView.documentView
     r = viewToPrint.bounds
     if p.margins.any?{|x| x != :auto } then
@@ -182,7 +182,7 @@ class Controller < NSObject
   end
 
   def loadUserScript(sender)
-    p = $clparser
+    p = CommandlineParser.instance
     urlRequest = NSURLRequest.requestWithURL_cachePolicy_timeoutInterval(p.userScript, p.cachingPolicy, p.timeout) 
     data, resp, error = NSURLConnection.sendSynchronousRequest_returningResponse_error(urlRequest)
     if error.nil? then
@@ -207,7 +207,7 @@ class Controller < NSObject
 private
 
   def log(msg)
-    $stderr.puts(msg) if $clparser.debug
+    $stderr.puts(msg) if CommandlineParser.instance.debug
   end
 
 

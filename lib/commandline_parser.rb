@@ -7,6 +7,14 @@ class CommandlineParser
 
   include OSX
 
+  class << self
+    def instance
+      @instance ||= new
+    end
+
+    private :new
+  end
+
   attr_accessor :source                   # NSURL
   attr_accessor :output                   # NSURL
   attr_accessor :paperSize                # NSSize

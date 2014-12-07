@@ -38,8 +38,8 @@ module WKPDF
     app_delegate = AppDelegate.alloc.init
     ::NSApp.setDelegate(app_delegate)
 
-    $clparser = CommandlineParser.new
-    $clparser.parse
+    parser = CommandlineParser.instance
+    parser.parse
 
     # use 1x1 size: when pagination is turned off, the view should grow to the 
     # required size, if turned on, the view should use the page size. 
@@ -57,16 +57,16 @@ module WKPDF
     webPrefs.setAllowsAnimatedImages(true)
     webPrefs.setAllowsAnimatedImageLooping(false)
     webPrefs.setJavaEnabled(false)
-    webPrefs.setPlugInsEnabled($clparser.enablePlugins)
-    webPrefs.setJavaScriptEnabled($clparser.enableJavascript)
+    webPrefs.setPlugInsEnabled(parser.enablePlugins)
+    webPrefs.setJavaScriptEnabled(parser.enableJavascript)
     webPrefs.setJavaScriptCanOpenWindowsAutomatically(false)
-    webPrefs.setShouldPrintBackgrounds($clparser.printBackground)
+    webPrefs.setShouldPrintBackgrounds(parser.printBackground)
     webPrefs.setUserStyleSheetEnabled(false)
 
-    if $clparser.userStylesheet != "" then
+    if parser.userStylesheet != "" then
       webPrefs.setUserStyleSheetEnabled(true)
-      webPrefs.setUserStyleSheetLocation($clparser.userStylesheet)
-      puts "setting user style sheet to #{$clparser.userStylesheet}\n" if $clparser.debug
+      webPrefs.setUserStyleSheetLocation(parser.userStylesheet)
+      puts "setting user style sheet to #{parser.userStylesheet}\n" if parser.debug
     end
 
     controller = Controller.alloc.initWithWebView(webView)
@@ -76,15 +76,15 @@ module WKPDF
     webView.setPreferences(webPrefs)
     webView.setMaintainsBackForwardList(false)
 
-    if $clparser.stylesheetMedia != "" then
-      webView.setMediaStyle($clparser.stylesheetMedia)
+    if parser.stylesheetMedia != "" then
+      webView.setMediaStyle(parser.stylesheetMedia)
     end
 
     pool = ::NSAutoreleasePool.alloc.init
 
-    puts "wkpdf started\n" if $clparser.debug
+    puts "wkpdf started\n" if parser.debug
     request = ::NSURLRequest.requestWithURL_cachePolicy_timeoutInterval(
-    $clparser.source, $clparser.cachingPolicy, $clparser.timeout)
+    parser.source, parser.cachingPolicy, parser.timeout)
 
     # TODO: detect timeout and terminate if timeout occured
 
