@@ -15,18 +15,20 @@ This fork makes the library work using ruby 2 (2.1.5) and Yosemite. The instruct
 
 1. Uncompress into a folder and move into it: `tar xzf RubyCocoa-1.2.0.tar.gz && rm RubyCocoa-1.2.0.tar.gz && cd RubyCocoa-1.2.0`
 
-1. Modify the install file `nano pre-install.rb`. (RubyCocoa 1.2.0 doesn't work with El Capitan, out of the box)
-  - Add the following two lines at the top:
+1. Modify the install file `nano pre-install.rb`. (RubyCocoa 1.2.0 doesn't work with El Capitan, out of the box). Add the following two lines at the top:
  ```
  Encoding.default_external = Encoding::UTF_8
  Encoding.default_internal = Encoding::UTF_8
  ```
+
+1. Modify the config file 'nano pre-config.rb'
  - Change the `lib_exists` method to
  ```
  def lib_exist?(path, sdkroot=@config['sdkroot'])
    File.exist?(path)
  end
  ```
+ - If you're using homebrew, update the libxml2 path from `/usr/include` to `/usr/local/include`.
 
 1. Config the RubyCocoa installation: `ruby install.rb config --target-archs="x86_64"` (see [this gist](https://gist.github.com/thibaudgg/294465))
 
